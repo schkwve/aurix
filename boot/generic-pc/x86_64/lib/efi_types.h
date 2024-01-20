@@ -40,6 +40,15 @@ typedef UINTN EFI_TPL;
 // https://github.com/vathpela/gnu-efi/blob/master/inc/x86_64/efibind.h
 #define EFIAPI __attribute__((ms_abi))
 
+// EFI Physical Address
+typedef UINT64 EFI_PHYSICAL_ADDRESS;
+
+// EFI Virtual Address
+typedef UINT64 EFI_VIRTUAL_ADDRESS;
+
+// Task Priority Level
+typedef UINTN EFI_TPL;
+
 // EFI Status Codes
 #define EFI_SUCCESS 0
 

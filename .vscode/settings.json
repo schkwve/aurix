@@ -1,0 +1,6 @@
+{
+	"files.associations": {
+		"efi_types.h": "c",
+		"axboot.h": "c"
+	}
+}
