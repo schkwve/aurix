@@ -1,6 +1,7 @@
 build/
 release/
 
+.DS_Store
 *.o
 *.d
 *.iso
