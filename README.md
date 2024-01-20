@@ -101,3 +101,7 @@ Running on real hardware can be more tricky, so whenever you encounter an error 
 #### NOTE: Pull Requests opened on GitHub will not be accepted! Please use [Codeberg](https://codeberg.org/schkwve/aurix) to submit issues and Pull Requests.
 
 Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for instructions on how to contribute to the AurixOS project.
+
+## License <a name="license"></a>
+
+AurixOS is distributed under the [CC BY-NC-SA 4.0](LICENSE) license. For additional details, please refer to the [Creative Commons Deed](https://creativecommons.org/licenses/by-nc-sa/4.0/).
