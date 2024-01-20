@@ -43,12 +43,12 @@ full_release: release_iso release_hdd release_sdcard
 
 .PHONY: run
 run: release_hdd
-	@$(QEMU) $(QEMU_FLAGS) $(QEMU_ARCH_FLAGS) -hda $(RELEASE_HDD)
+	@$(QEMU) $(QEMU_FLAGS) $(QEMU_ARCH_FLAGS) -drive file=$(RELEASE_HDD),format=raw
 
 # TODO: Maybe add a nice message with instructions here before running qemu?
 .PHONY: rundbg
 rundbg: release_hdd
-	@$(QEMU) -S $(QEMU_FLAGS) $(QEMU_ARCH_FLAGS) -hda $(RELEASE_HDD)
+	@$(QEMU) -S $(QEMU_FLAGS) $(QEMU_ARCH_FLAGS) -drive file=$(RELEASE_HDD),format=raw
 
 .PHONY: release_iso
 release_iso: $(RELEASE_ISO)

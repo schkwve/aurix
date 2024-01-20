@@ -12,4 +12,4 @@ override INTERNAL_LDFLAGS := -target x86_64-unknown-windows \
 							-nostdlib \
 							-fuse-ld=lld-link \
 							-Wl,-subsystem:efi_application \
-							-Wl,-entry:EfiMain
+							-Wl,-entry:efi_main
