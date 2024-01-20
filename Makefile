@@ -36,7 +36,7 @@ else
 endif
 
 .PHONY: all
-all: full_release
+all: bootloader kernel
 
 .PHONY: full_release
 full_release: release_iso release_hdd release_sdcard
@@ -69,7 +69,7 @@ kernel:
 	@printf ">>> Building kernel...\n"
 	@$(MAKE) -C kernel
 
-$(RELEASE_ISO): sysroot bootloader kernel release_hdd
+$(RELEASE_ISO): bootloader kernel release_hdd
 ifeq ($(ARCH),x86_64)
 	@printf ">>> Generating ISO image...\n"
 	@mkdir -p $(RELEASE_DIR)
@@ -82,14 +82,14 @@ else
 	@printf "ISO image generation is not supported for $(ARCH)/$(MACHINE).\n"
 endif
 
-$(RELEASE_HDD): sysroot bootloader kernel
+$(RELEASE_HDD): bootloader kernel
 	@printf ">>> Generating HDD image...\n"
 	@mkdir -p $(RELEASE_DIR)
 	@dd if=/dev/zero of=$(RELEASE_HDD) bs=1k count=1440 2>/dev/null
 	@mformat -i $(RELEASE_HDD) -f 1440 ::
 	@mcopy -s -i $(RELEASE_HDD) build/output/* sysroot/* ::
 
-$(RELEASE_SDCARD): sysroot bootloader kernel
+$(RELEASE_SDCARD): bootloader kernel
 	@printf ">>> Generating SD Card image...\n"
 	@mkdir -p $(RELEASE_DIR)
 	@printf "SD Card image generation is not yet supported, skipping...\n"
