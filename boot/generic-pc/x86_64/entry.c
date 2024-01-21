@@ -1,6 +1,7 @@
 #include <efi.h>
 
 #include <axboot.h>
+#include <print.h>
 
 EFI_HANDLE g_ImageHandle;
 EFI_SYSTEM_TABLE *g_SystemTable;
@@ -17,10 +18,13 @@ efi_main(EFI_HANDLE ImageHandle,
 
 	g_SystemTable->ConOut->ClearScreen(g_SystemTable->ConOut);
 
+	char16_t *world = L"world";
+	axboot_printf(L"Hello %s!", world);
+	
 	// disable watchdog
 	Status = SystemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
 	if (EFI_ERROR(Status)) {
-		// TODO: print error
+		axboot_printf(u"Failed to disable UEFI watchdog!");
 	}
 	
 	for (;;);
