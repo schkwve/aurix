@@ -28,6 +28,19 @@ efi_main(EFI_HANDLE ImageHandle,
 
 	// parse the bootloader configuration
 	axboot_config_t *config = axboot_read_config();
+	if (config == NULL) {
+		g_SystemTable->BootServices->FreePool(config);
+
+		axboot_printf(L"A fatal error has occured and AxBoot cannot continue.\r\n");
+		axboot_printf(L"Rebooting in 5 seconds...\r\n");
+		
+		// wait 5 seconds and reboot
+		g_SystemTable->BootServices->Stall(5000000);
+		g_SystemTable->RuntimeServices->ResetSystem(EfiResetWarm, EFI_SUCCESS, 0, NULL);
+	}
+
+	// remember to free the configuration pool
+	g_SystemTable->BootServices->FreePool(config);
 
 	for (;;);
 
