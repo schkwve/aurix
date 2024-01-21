@@ -4,6 +4,7 @@
 #include <axboot.h>
 #include <config.h>
 #include <print.h>
+#include <ui/menu.h>
 
 EFI_HANDLE g_ImageHandle;
 EFI_SYSTEM_TABLE *g_SystemTable;
@@ -40,10 +41,18 @@ efi_main(EFI_HANDLE ImageHandle,
 		g_SystemTable->RuntimeServices->ResetSystem(EfiResetWarm, EFI_SUCCESS, 0, NULL);
 	}
 
+
 	// remember to free the configuration pool
 	g_SystemTable->BootServices->FreePool(config);
 
-	for (;;);
+	for (;;) {
+		ui_boot_menu_draw();
+
+		// TODO: Check for keystrokes
+		// F1 = Shutdown
+		// F2 = Reboot
+		// ESC = Redraw boot menu
+	}
 
 	return EFI_SUCCESS;
 }
