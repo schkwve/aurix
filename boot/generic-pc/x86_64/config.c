@@ -1,4 +1,5 @@
 #include <efi.h>
+#include <efilib.h>
 
 #include <axboot.h>
 #include <config.h>
