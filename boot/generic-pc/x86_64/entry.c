@@ -19,7 +19,7 @@ efi_main(EFI_HANDLE ImageHandle,
 
 	// disable watchdog
 	Status = SystemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
-	if (Status != EFI_SUCCESS) {
+	if (EFI_ERROR(Status)) {
 		// TODO: print error
 	}
 	
