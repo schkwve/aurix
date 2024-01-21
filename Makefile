@@ -1,5 +1,5 @@
-export ARCH ?= x86_64
-export MACHINE ?= generic-pc
+export ARCH ?= riscv64
+export MACHINE ?= qemu-virt
 export DEBUG ?= yes
 
 export GIT_REV := $(shell git rev-parse --short HEAD)
@@ -16,7 +16,7 @@ RELEASE_SDCARD := $(RELEASE_DIR)/aurixos-sdcard-$(GIT_REV)_$(ARCH)_$(MACHINE).im
 
 # User-changeable flags
 export CFLAGS ?= -O2 -g -Wall -Wextra -Wpedantic
-export ASFLAGS ?=
+export SFLAGS ?= 
 export LDFLAGS ?=
 
 include arch/$(MACHINE)/$(ARCH)/config.mk
@@ -31,6 +31,8 @@ else ifeq ($(ARCH),i386)
 	$(error Support for i386 is not yet available!)
 else ifeq ($(ARCH),armv8)
 	$(error Support for armv8 is not yet available!)
+else ifeq ($(ARCH),riscv64)
+	# RISC-V is supported so dont error out
 else
 	$(error Architecture '$(ARCH)' is not supported.)
 endif
@@ -41,14 +43,28 @@ all: bootloader kernel
 .PHONY: full_release
 full_release: release_iso release_hdd release_sdcard
 
+# try to generate a unique GDB port
+GDBPORT = $(shell expr `id -u` % 5000 + 25000)
+# QEMU's gdb stub command line changed in 0.11
+QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; \
+	then echo "-gdb tcp::$(GDBPORT)"; \
+	else echo "-s -p $(GDBPORT)"; fi)
+ifndef CPUS
+CPUS := 1
+endif
+
 .PHONY: run
 run: release_hdd
+ifeq ($(MACHINE),qemu-virt)# qemu-virt is special cuz it has no firmware at all
+	@$(QEMU) $(QEMU_FLAGS) $(QEMU_ARCH_FLAGS) -kernel build/output/bootcode.bin -drive file=$(RELEASE_HDD),format=raw
+else
 	@$(QEMU) $(QEMU_FLAGS) $(QEMU_ARCH_FLAGS) -drive file=$(RELEASE_HDD),format=raw
+endif
 
 # TODO: Maybe add a nice message with instructions here before running qemu?
 .PHONY: rundbg
 rundbg: release_hdd
-	@$(QEMU) -S $(QEMU_FLAGS) $(QEMU_ARCH_FLAGS) -drive file=$(RELEASE_HDD),format=raw
+	@$(QEMU) $(QEMUGDB) $(QEMU_FLAGS) $(QEMU_ARCH_FLAGS) -drive file=$(RELEASE_HDD),format=raw
 
 .PHONY: release_iso
 release_iso: $(RELEASE_ISO)
