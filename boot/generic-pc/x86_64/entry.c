@@ -2,7 +2,6 @@
 #include <efilib.h>
 
 #include <axboot.h>
-#include <config.h>
 #include <print.h>
 #include <ui/menu.h>
 
@@ -14,6 +13,8 @@ efi_main(EFI_HANDLE ImageHandle,
 		 EFI_SYSTEM_TABLE *SystemTable)
 {
 	EFI_STATUS Status;
+	EFI_INPUT_KEY key;
+	UINTN rows;
 
 	// we should use these global variables from now on
 	g_ImageHandle = ImageHandle;
@@ -28,30 +29,25 @@ efi_main(EFI_HANDLE ImageHandle,
 		axboot_printf(L"Failed to disable UEFI watchdog!\r\n");
 	}
 
-	// parse the bootloader configuration
-	axboot_config_t *config = axboot_read_config();
-	if (config == NULL) {
-		g_SystemTable->BootServices->FreePool(config);
+	// Query number of rows
+	g_SystemTable->ConOut->QueryMode(g_SystemTable->ConOut, 0, NULL, &rows);
 
-		axboot_printf(L"A fatal error has occured and AxBoot cannot continue.\r\n");
-		axboot_printf(L"Rebooting in 5 seconds...\r\n");
-		
-		// wait 5 seconds and reboot
-		g_SystemTable->BootServices->Stall(5000000);
-		g_SystemTable->RuntimeServices->ResetSystem(EfiResetWarm, EFI_SUCCESS, 0, NULL);
-	}
-
-
-	// remember to free the configuration pool
-	g_SystemTable->BootServices->FreePool(config);
-
+	ui_boot_menu_draw();
+	g_SystemTable->ConIn->Reset(g_SystemTable->ConIn, 0);
 	for (;;) {
-		ui_boot_menu_draw();
-
-		// TODO: Check for keystrokes
-		// F1 = Shutdown
-		// F2 = Reboot
-		// ESC = Redraw boot menu
+		g_SystemTable->ConIn->ReadKeyStroke(g_SystemTable->ConIn, &key);
+		
+		if (key.ScanCode == EFI_SCANCODE_FN1) {
+			g_SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+		} else if (key.ScanCode == EFI_SCANCODE_FN2) {
+			g_SystemTable->RuntimeServices->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
+		}
+		
+		if (key.UnicodeChar == EFI_CHAR_CARRIAGE_RETURN) {
+			// Boot System
+			g_SystemTable->ConOut->SetCursorPosition(g_SystemTable->ConOut, 0, rows - 2);
+			axboot_printf(L"Booting AurixOS...");
+		}
 	}
 
 	return EFI_SUCCESS;
