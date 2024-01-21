@@ -1,5 +1,5 @@
-export ARCH ?= riscv64
-export MACHINE ?= qemu-virt
+export ARCH ?= x86_64
+export MACHINE ?= generic-pc
 export DEBUG ?= yes
 
 export GIT_REV := $(shell git rev-parse --short HEAD)
@@ -16,7 +16,7 @@ RELEASE_SDCARD := $(RELEASE_DIR)/aurixos-sdcard-$(GIT_REV)_$(ARCH)_$(MACHINE).im
 
 # User-changeable flags
 export CFLAGS ?= -O2 -g -Wall -Wextra -Wpedantic
-export SFLAGS ?= 
+export ASFLAGS ?= 
 export LDFLAGS ?=
 
 include arch/$(MACHINE)/$(ARCH)/config.mk
@@ -32,7 +32,9 @@ else ifeq ($(ARCH),i386)
 else ifeq ($(ARCH),armv8)
 	$(error Support for armv8 is not yet available!)
 else ifeq ($(ARCH),riscv64)
-	# RISC-V is supported so dont error out
+	ifneq ($(MACHINE),qemu-virt)
+		$(error Only qemu-virt machine is available for riscv64!)
+	endif
 else
 	$(error Architecture '$(ARCH)' is not supported.)
 endif
@@ -55,11 +57,7 @@ endif
 
 .PHONY: run
 run: release_hdd
-ifeq ($(MACHINE),qemu-virt)# qemu-virt is special cuz it has no firmware at all
-	@$(QEMU) $(QEMU_FLAGS) $(QEMU_ARCH_FLAGS) -kernel build/output/bootcode.bin -drive file=$(RELEASE_HDD),format=raw
-else
 	@$(QEMU) $(QEMU_FLAGS) $(QEMU_ARCH_FLAGS) -drive file=$(RELEASE_HDD),format=raw
-endif
 
 # TODO: Maybe add a nice message with instructions here before running qemu?
 .PHONY: rundbg
