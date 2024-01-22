@@ -33,6 +33,7 @@ EDK2_OPTS_UINT8 += PcdDebugClearMemoryValue=0xAF
 override INTERNAL_ASFLAGS := -fwin64
 
 override INTERNAL_CFLAGS := -target x86_64-unknown-windows \
+							-fno-delayed-template-parsing \
 							$(foreach d, $(INCLUDE_DIRS), -I$d) \
 							-DgEfiCallerBaseName=\"AxBoot\" \
 							$(EDK2_OPTS_UINT32:%=-D_PCD_GET_MODE_32_%) \
