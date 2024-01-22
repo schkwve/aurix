@@ -4,6 +4,8 @@
 #include <Library/DebugLib.h>
 
 #include <axboot.h>
+#include <config.h>
+#include <loader/aurixos.h>
 #include <ui/menu.h>
 
 EFI_HANDLE g_ImageHandle;
@@ -19,31 +21,31 @@ EFI_STATUS
 efi_main(EFI_HANDLE ImageHandle,
 		 EFI_SYSTEM_TABLE *SystemTable)
 {
-	EFI_STATUS Status;
-	EFI_INPUT_KEY Key;
+	EFI_STATUS status;
+	EFI_INPUT_KEY key;
 
 	// we should use these global variables from now on
 	g_ImageHandle = ImageHandle;
 	g_SystemTable = SystemTable;
 
 	if (EFI_ERROR(UefiBootServicesTableLibConstructor(ImageHandle, SystemTable))) {
-		Print(L"EfiMain: An error has been invoked during the execution of the program (Status code: %r)\n", Status);
+		Print(L"efi_main: An error has occured while initializing UEFI! (Status code: %r)\n", status);
 		AxBootFatal();
 	}
     if (EFI_ERROR(UefiRuntimeServicesTableLibConstructor(ImageHandle, SystemTable))) {
-		Print(L"EfiMain: An error has been invoked during the execution of the program (Status code: %r)\n", Status);
+		Print(L"efi_main: An error has occured while initializing UEFI! (Status code: %r)\n", status);
 		AxBootFatal();
 	}
     if (EFI_ERROR(RuntimeDriverLibConstruct(ImageHandle, SystemTable))) {
-		Print(L"EfiMain: An error has been invoked during the execution of the program (Status code: %r)\n", Status);
+		Print(L"efi_main: An error has occured while initializing UEFI! (Status code: %r)\n", status);
 		AxBootFatal();
 	}
     if (EFI_ERROR(DxeDebugLibConstructor(ImageHandle, SystemTable))) {
-		Print(L"EfiMain: An error has been invoked during the execution of the program (Status code: %r)\n", Status);
+		Print(L"efi_main: An error has occured while initializing UEFI! (Status code: %r)\n", status);
 		AxBootFatal();
 	}
     if (EFI_ERROR(BaseRngLibConstructor())) {
-		Print(L"EfiMain: An error has been invoked during the execution of the program (Status code: %r)\n", Status);
+		Print(L"efi_main: An error has occured while initializing UEFI! (Status code: %r)\n", status);
 		AxBootFatal();
 	}
 
@@ -51,26 +53,45 @@ efi_main(EFI_HANDLE ImageHandle,
 	g_SystemTable->ConOut->ClearScreen(g_SystemTable->ConOut);
 	
 	// disable watchdog
-	Status = SystemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
-	if (EFI_ERROR(Status)) {
+	status = SystemTable->BootServices->SetWatchdogTimer(0, 0, 0, NULL);
+	if (EFI_ERROR(status)) {
 		Print(L"Failed to disable UEFI watchdog!\r\n");
 	}
 
-	UINTN Rows = 0;
-	g_SystemTable->ConOut->QueryMode(g_SystemTable->ConOut, 0, NULL, &Rows);
+	UINTN rows = 0;
+	g_SystemTable->ConOut->QueryMode(g_SystemTable->ConOut, 0, NULL, &rows);
 
 	ui_boot_menu_draw();
 	g_SystemTable->ConIn->Reset(g_SystemTable->ConIn, 0);
 	for (;;) {
-		g_SystemTable->ConIn->ReadKeyStroke(g_SystemTable->ConIn, &Key);
+		g_SystemTable->ConIn->ReadKeyStroke(g_SystemTable->ConIn, &key);
 
-		if (Key.ScanCode == SCAN_F1) {
+		if (key.ScanCode == SCAN_F1) {
 			g_SystemTable->RuntimeServices->ResetSystem(EfiResetShutdown, EFI_SUCCESS, 0, NULL);
-		} else if (Key.ScanCode == SCAN_F2) {
+		} else if (key.ScanCode == SCAN_F2) {
 			g_SystemTable->RuntimeServices->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
-		} else if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-			g_SystemTable->ConOut->SetCursorPosition(g_SystemTable->ConOut, 0, Rows - 2);
-			Print(L"Booting AurixOS...");
+		} else if (key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
+			g_SystemTable->ConOut->SetCursorPosition(g_SystemTable->ConOut, 0, rows - 2);
+			Print(L"Booting AurixOS...\n");
+			
+			status = config_get_entry();
+			if (EFI_ERROR(status)) {
+				Print(L"efi_main: An error has occured while loading AurixOS! (Status code: %r)\n", status);
+				AxBootFatal();
+			}
+
+			status = aurixos_boot(&g_axos_entry);
+			if (EFI_ERROR(status)) {
+				Print(L"efi_main: An error has occured while loading AurixOS! (Status code: %r)\n", status);
+				AxBootFatal();
+			}
+
+			// the kernel returned, which means nothing good
+			g_SystemTable->ConOut->ClearScreen(g_SystemTable->ConOut);
+			Print(L"A fatal error has occured and AurixOS cannot continue execution.\r\n");
+			Print(L"The system will reboot in 10 seconds...\r\n");
+			g_SystemTable->BootServices->Stall(10000000);
+			g_SystemTable->RuntimeServices->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
 		}
 	}
 
@@ -81,7 +102,7 @@ void
 AxBootFatal(void)
 {
 	Print(L"\r\nFailed to boot AurixOS!\r\n");
-	Print(L"Rebooting in 5 seconds...");
+	Print(L"The system will reboot in 5 seconds...");
 	g_SystemTable->BootServices->Stall(5000000);
 	g_SystemTable->RuntimeServices->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
 }
