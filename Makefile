@@ -15,7 +15,7 @@ RELEASE_HDD := $(RELEASE_DIR)/aurixos-hdd-$(GIT_REV)_$(ARCH)_$(MACHINE).img
 RELEASE_SDCARD := $(RELEASE_DIR)/aurixos-sdcard-$(GIT_REV)_$(ARCH)_$(MACHINE).img
 
 # User-changeable flags
-export CFLAGS ?= -O2 -g -Wall -Wextra -Wpedantic
+export CFLAGS ?= -O2 -g -Wall -Wextra
 export ASFLAGS ?= 
 export LDFLAGS ?=
 
