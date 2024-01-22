@@ -1,4 +1,4 @@
-override KERNEL_FILE := axkrnl.elf
+override KERNEL_FILE := System/axkrnl.elf
 
 override AS := nasm
 override CC := x86_64-elf-gcc
