@@ -20,11 +20,11 @@
 BOOT_ENTRY *gDefaultEntry = NULL;
 LIST_ENTRY gBootEntries = INITIALIZE_LIST_HEAD_VARIABLE(gBootEntries);
 
-static CHAR16 *ConfigPaths[] = { L"boot\\tomatboot.cfg", L"tomatboot.cfg",
-
-				 // fallback on limine configuration
-				 // file because they are compatible
-				 L"boot\\limine.cfg", L"limine.cfg" };
+static CHAR16 *ConfigPaths[] = {
+	L"System\\axboot.cfg",
+	L"boot\\axboot.cfg",
+	L"axboot.cfg",
+};
 
 BOOT_ENTRY *GetBootEntryAt(int index)
 {
@@ -297,11 +297,11 @@ static EFI_STATUS LoadBootEntries(EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FS,
 			// Global keys
 			//------------------------------------------
 		} else if (CurrentEntry == NULL) {
-			if (CHECK_OPTION(L"TIMEOUT")) {
+			if (CHECK_OPTION(L"timeout")) {
 				gBootConfigOverride.BootDelay =
 					(INT32)StrDecimalToUintn(
 						StrStr(Line, L"=") + 1);
-			} else if (CHECK_OPTION(L"DEFAULT_ENTRY")) {
+			} else if (CHECK_OPTION(L"default")) {
 				gBootConfigOverride.DefaultOS =
 					(INT32)StrDecimalToUintn(
 						StrStr(Line, L"=") + 1);
@@ -316,8 +316,7 @@ static EFI_STATUS LoadBootEntries(EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FS,
 			//------------------------------------------
 			// path of the kernel
 			//------------------------------------------
-			if (CHECK_OPTION(L"PATH") ||
-			    CHECK_OPTION(L"KERNEL_PATH")) {
+			if (CHECK_OPTION(L"kernel")) {
 				CHAR16 *Path = StrStr(Line, L"=") + 1;
 				CHECK_AND_RETHROW(
 					ParseUri(Path, &CurrentEntry->Fs,
@@ -326,21 +325,21 @@ static EFI_STATUS LoadBootEntries(EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FS,
 				//------------------------------------------
 				// command line arguments
 				//------------------------------------------
-			} else if (CHECK_OPTION(L"CMDLINE") ||
-				   CHECK_OPTION(L"KERNEL_CMDLINE")) {
+			} else if (CHECK_OPTION(L"cmdline")) {
 				CurrentEntry->Cmdline =
 					CopyString(StrStr(Line, L"=") + 1);
 
 				// the boot protocol to use (onyl one)
-			} else if (CHECK_OPTION(L"PROTOCOL") ||
-				   CHECK_OPTION("KERNEL_PROTO") ||
-				   CHECK_OPTION("KERNEL_PROTOCOL")) {
+			} else if (CHECK_OPTION(L"protocol")) {
 				CHAR16 *Protocol = StrStr(Line, L"=") + 1;
 
 				// check the options
-				if (StrCmp(Protocol, L"linux") == 0) {
+				if (StrCmp(Protocol, L"aurix") == 0) {
+					CurrentEntry->Protocol = BOOT_AURIX;
+				} else if (StrCmp(Protocol, L"linux") == 0) {
 					CurrentEntry->Protocol = BOOT_LINUX;
-				} else if (StrCmp(Protocol, L"mb2") == 0) {
+				} else if (StrCmp(Protocol, L"mb2") == 0 ||
+							StrCmp(Protocol, L"multiboot2") == 0) {
 					CurrentEntry->Protocol = BOOT_MB2;
 				} else if (StrCmp(Protocol, L"stivale") == 0) {
 					CurrentEntry->Protocol = BOOT_STIVALE;
@@ -355,7 +354,7 @@ static EFI_STATUS LoadBootEntries(EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FS,
 				//------------------------------------------
 				// module
 				//------------------------------------------
-			} else if (CHECK_OPTION(L"MODULE_PATH")) {
+			} else if (CHECK_OPTION(L"module_path")) {
 				CHAR16 *Path = StrStr(Line, L"=") + 1;
 
 				BOOT_MODULE *Module =
@@ -372,18 +371,18 @@ static EFI_STATUS LoadBootEntries(EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FS,
 					CurrentModuleString = Module;
 				}
 
-			} else if (CHECK_OPTION(L"MODULE_STRING")) {
+			} else if (CHECK_OPTION(L"module_string")) {
 				CHECK_TRACE(
 					CurrentEntry->Protocol == BOOT_MB2 ||
 						CurrentEntry->Protocol ==
 							BOOT_STIVALE ||
 						CurrentEntry->Protocol ==
 							BOOT_STIVALE2,
-					"`MODULE_STRING` is only available for mb2 and stivale{,2} (%d)",
+					"`module_string` is only available for mb2 and stivale{,2} (%d)",
 					CurrentEntry->Protocol);
 				CHECK_TRACE(
 					CurrentModuleString != NULL,
-					"MODULE_STRING must only appear after a MODULE_PATH");
+					"module_string must only appear after a MODULE_PATH");
 
 				// set the tag
 				CurrentModuleString->Tag =

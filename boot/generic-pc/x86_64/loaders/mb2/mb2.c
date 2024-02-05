@@ -9,6 +9,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
+#include <axboot.h>
 #include <config/BootEntries.h>
 #include <util/FileUtils.h>
 #include <util/Except.h>
@@ -310,13 +311,13 @@ EFI_STATUS LoadMB2Kernel(BOOT_ENTRY *Entry)
 	// push the bootloader name
 	{
 		TRACE("Pushing bootloader name");
-		UINTN size = sizeof("TomatBoot v2 UEFI") +
+		UINTN size = sizeof("AxBoot " AXBOOT_VERSION_STR) +
 			     OFFSET_OF(struct multiboot_tag_string, string);
 		struct multiboot_tag_string *string =
 			PushBootParams(NULL, size);
 		string->type = MULTIBOOT_TAG_TYPE_BOOT_LOADER_NAME;
 		string->size = size;
-		AsciiStrCpy(string->string, "TomatBoot-UEFI");
+		AsciiStrCpy(string->string, "Axboot v" AXBOOT_VERSION_STR);
 	}
 
 	// push the modules

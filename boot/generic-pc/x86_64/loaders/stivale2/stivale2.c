@@ -13,6 +13,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
+#include <axboot.h>
 #include <config/BootEntries.h>
 #include <config/BootConfig.h>
 #include <loaders/elf/ElfLoader.h>
@@ -257,9 +258,9 @@ EFI_STATUS LoadStivale2Kernel(BOOT_ENTRY *Entry)
 
 	// setup the struct
 	STIVALE2_STRUCT *Struct = AllocateZeroPool(sizeof(STIVALE2_STRUCT));
-	AsciiStrnCpy(Struct->BootloaderBrand, "TomatBoot-UEFI",
+	AsciiStrnCpy(Struct->BootloaderBrand, "AxBoot",
 		     sizeof(Struct->BootloaderBrand));
-	AsciiStrnCpy(Struct->BootloaderVersion, "v0.1",
+	AsciiStrnCpy(Struct->BootloaderVersion, AXBOOT_VERSION_STR,
 		     sizeof(Struct->BootloaderVersion));
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
