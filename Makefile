@@ -83,6 +83,11 @@ kernel:
 	@printf ">>> Building kernel...\n"
 	@$(MAKE) -C kernel
 
+.PHONY: format
+format:
+	@printf ">>> Formatting code...\n"
+	@find . -name "*.c" -not -path "*/ex/*" -o -name "*.h" -not -path "*/ex/*" | xargs clang-format -i
+
 $(RELEASE_ISO): bootloader kernel release_hdd
 ifeq ($(ARCH),x86_64)
 	@printf ">>> Generating ISO image...\n"
