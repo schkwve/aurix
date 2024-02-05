@@ -1,6 +1,6 @@
 override BOOT_FILE := BOOTX64.EFI
 
-override INCLUDE_DIRS := lib/Include lib/Include/X64 include
+override INCLUDE_DIRS := ex/uefi/Include ex/uefi/Include/X64 include .
 
 override AS := nasm
 override CC := clang
@@ -30,7 +30,8 @@ EDK2_OPTS_UINT8 := PcdSpeculationBarrierType=0x1
 EDK2_OPTS_UINT8 += PcdDebugPropertyMask=DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED
 EDK2_OPTS_UINT8 += PcdDebugClearMemoryValue=0xAF
 
-override INTERNAL_ASFLAGS := -fwin64
+override INTERNAL_ASFLAGS := -fwin64 \
+							$(foreach d, $(INCLUDE_DIRS), -I$d)
 
 override INTERNAL_CFLAGS := -target x86_64-unknown-windows \
 							-fno-delayed-template-parsing \
@@ -45,4 +46,4 @@ override INTERNAL_LDFLAGS := -target x86_64-unknown-windows \
 							-nostdlib \
 							-fuse-ld=lld-link \
 							-Wl,-subsystem:efi_application \
-							-Wl,-entry:efi_main
+							-Wl,-entry:EfiMain

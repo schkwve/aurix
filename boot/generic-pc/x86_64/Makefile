@@ -5,10 +5,10 @@ INTERNAL_CFLAGS += -g -D_DEBUG
 endif
 
 CFILES := $(shell find . -type f -name '*.c')
-ASFILES := $(shell find . -type f -name '*.asm')
+ASFILES := $(shell find . -type f -name '*.nasm')
 
 BOOT_OBJS := $(CFILES:%.c=$(BUILD_DIR)/%.c.o) \
-			$(ASFILES:%.asm=$(BUILD_DIR)/%.asm.o)
+			$(ASFILES:%.nasm=$(BUILD_DIR)/%.nasm.o)
 
 HEADER_DEPS := $(CFILES:.c=.d)
 
@@ -21,7 +21,7 @@ $(BUILD_DIR)/%.c.o: %.c
 	@printf "  CC $<\n"
 	@$(CC) $(INTERNAL_CFLAGS) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.asm.o: %.asm
+$(BUILD_DIR)/%.nasm.o: %.nasm
 	@mkdir -p $(@D)
 	@printf "  AS $<\n"
 	@$(AS) $(INTERNAL_ASFLAGS) $(ASFLAGS) $< -o $@
