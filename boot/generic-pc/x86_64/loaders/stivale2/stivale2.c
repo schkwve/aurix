@@ -483,7 +483,7 @@ EFI_STATUS LoadStivale2Kernel(BOOT_ENTRY *Entry)
 			case EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC: {
 				if (!Requestedx2Apic) {
 					EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC_STRUCTURE
-						*Lapic = (void *)MadtEntry;
+					*Lapic = (void *)MadtEntry;
 
 					// check if the cpu is enabled and if it can be enabled
 					if (!(Lapic->Flags &
@@ -508,7 +508,7 @@ EFI_STATUS LoadStivale2Kernel(BOOT_ENTRY *Entry)
 			case EFI_ACPI_4_0_PROCESSOR_LOCAL_X2APIC: {
 				if (Requestedx2Apic) {
 					EFI_ACPI_4_0_PROCESSOR_LOCAL_X2APIC_STRUCTURE
-						*Lapic = (void *)MadtEntry;
+					*Lapic = (void *)MadtEntry;
 					Smp->SmpInfo[Smp->CpuCount].LapicId =
 						Lapic->X2ApicId;
 					Smp->SmpInfo[Smp->CpuCount]

@@ -102,6 +102,13 @@ Running on real hardware can be more tricky, so whenever you encounter an error 
 
 Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for instructions on how to contribute to the AurixOS project.
 
+## Acknowledgements <a name="acknowledgements"></a>
+
+- [TomatBoot](https://github.com/TomatOrg/TomatBoot) - base for [x86_64 AxBoot](boot/generic-pc/x86_64) bootloader.
+
 ## License <a name="license"></a>
 
-AurixOS is distributed under the [CC BY-NC-SA 4.0](LICENSE) license. For additional details, please refer to the [Creative Commons Deed](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+AurixOS is licensed under the [MIT license](LICENSE).
+
+> [!NOTE]  
+> Parts of AurixOS are distributed under a different license. See the [Acknowledgements](#acknowledgements) section to learn more.
