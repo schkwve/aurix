@@ -1,10 +1,10 @@
+INCLUDE_DIRS := libc arch/$(MACHINE)/$(ARCH) .
+
 include arch/$(MACHINE)/$(ARCH)/config.mk
 
 ifeq ($(DEBUG),yes)
 INTERNAL_CFLAGS += -g -D_DEBUG
 endif
-
-INCLUDE_DIRS := . libc arch/$(MACHINE)/$(ARCH)
 
 ARCH_CFILES := $(shell find arch/$(MACHINE)/$(ARCH) -type f -name '*.c')
 ARCH_ASFILES := $(shell find arch/$(MACHINE)/$(ARCH) -type f -name '*.asm')

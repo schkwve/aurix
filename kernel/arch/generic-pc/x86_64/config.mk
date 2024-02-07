@@ -4,9 +4,11 @@ override AS := nasm
 override CC := x86_64-elf-gcc
 override LD := x86_64-elf-ld
 
-override INTERNAL_ASFLAGS := -felf64
+override INTERNAL_ASFLAGS := $(foreach d, $(INCLUDE_DIRS), -I$d) \
+							-felf64
 
-override INTERNAL_CFLAGS := -std=c11 \
+override INTERNAL_CFLAGS := $(foreach d, $(INCLUDE_DIRS), -I$d) \
+							-std=c11 \
 							-ffreestanding \
 							-fno-stack-protector \
 							-fno-stack-check \
