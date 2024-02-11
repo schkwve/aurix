@@ -5,7 +5,8 @@ override CC := x86_64-elf-gcc
 override LD := x86_64-elf-ld
 
 override INTERNAL_ASFLAGS := $(foreach d, $(INCLUDE_DIRS), -I$d) \
-							-felf64
+							-felf64 \
+							-g
 
 override INTERNAL_CFLAGS := $(foreach d, $(INCLUDE_DIRS), -I$d) \
 							-std=c11 \
