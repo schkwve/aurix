@@ -20,7 +20,7 @@ export ASFLAGS ?=
 export LDFLAGS ?=
 
 include arch/$(MACHINE)/$(ARCH)/config.mk
-QEMU_FLAGS ?= -m 2G
+QEMU_FLAGS ?= -m 2G -serial stdio
 
 # Check if arch/machine are correct or supported
 ifeq ($(ARCH),x86_64)
