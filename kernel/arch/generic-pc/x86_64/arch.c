@@ -5,6 +5,9 @@
 
 #include <arch/arch.h>
 #include <cpu/gdt.h>
+#include <cpu/idt.h>
+
+#include <aurix.h>
 
 /**
  * @brief	Initializes architecture-specific functionality and devices
@@ -18,5 +21,5 @@
 void arch_init(void)
 {
 	gdt_init();
-	// idt_init();
+	idt_init();
 }

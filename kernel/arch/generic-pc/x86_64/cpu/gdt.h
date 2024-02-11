@@ -1,3 +1,8 @@
+/**
+ * @file	kernel/arch/cpu/gdt.h
+ * @brief	x86_64 GDT header
+ */
+
 #ifndef GDT_H
 #define GDT_H
 

@@ -4,6 +4,7 @@
  */
 
 #include <cpu/gdt.h>
+#include <aurix.h>
 
 __attribute__((aligned(0x1000))) gdt_t gdt[GDT_ENTRIES];
 
@@ -33,6 +34,8 @@ void gdt_init(void)
 	gdtr.offset = (uint64_t)&gdt;
 
 	gdt_load(&gdtr);
+
+	klog("loaded at 0x%llx (size: %d bytes)", &gdt, sizeof(gdt));
 }
 
 /**
